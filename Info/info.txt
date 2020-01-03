@@ -3,5 +3,6 @@ Sites de referência:
 https://reactjs.org/docs/create-a-new-react-app.html
 https://material-ui.com/pt/getting-started/installation/
 https://marmelab.com/admin-on-rest/Tutorial.html
+https://grokonez.com/frontend/angular/angular-nodejs-jwt-authenticationfullstack-nodejs-express-restapis-jwt-bcryptjs-sequelize-mysql-part-2-buildbackend 
 
 livro "Introdução ao Desenvolvimento Moderno Para a Web"
