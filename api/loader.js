@@ -1,9 +1,9 @@
 const app = require("./server");
-const router = require("./app/router/router.js");
+const router = require("./src/router/router.js");
 const expressSanitizer = require("express-sanitizer");
 const bodyParser = require("body-parser");
 const expressValidator = require("express-validator");
-const db = require("./app/config/db.config.js");
+const db = require("./src/config/db.config.js");
 const Role = db.role;
 
 app.use(bodyParser.json(), bodyParser.urlencoded({ extended: true }));
