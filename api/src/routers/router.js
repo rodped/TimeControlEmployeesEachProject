@@ -53,7 +53,7 @@ const router = require("express").Router();
 const verifySignUp = require("./verifySignUp");
 const authJwt = require("./verifyJwtToken");
 
-const controller = require("../controller/controller.js");
+const controller = require("../controller/controller");
 
 router.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");

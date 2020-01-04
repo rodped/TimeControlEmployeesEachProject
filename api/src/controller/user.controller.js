@@ -244,18 +244,20 @@ async function login(req, res) {
   })
     .then(user => {
       if (!user) {
-        return res
+        res
           .status(jsonMessages.db.noRecords.status)
           .send(jsonMessages.db.noRecords);
+        return;
       }
       var passwordIsValid = bcrypt.compareSync(
         req.body.password,
         user.password
       );
       if (!passwordIsValid) {
-        return res
+        res
           .status(loginMessages.user.loginError.status)
           .send(loginMessages.user.loginError);
+        return;
       }
       var token = jwt.sign({ id: user.id }, config.secret, {
         expiresIn: 86400 // expires in 24 hours

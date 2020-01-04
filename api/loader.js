@@ -1,5 +1,5 @@
 const app = require("./server");
-const router = require("./src/router/router.js");
+const router = require("./src/routers/router.js");
 const expressSanitizer = require("express-sanitizer");
 const bodyParser = require("body-parser");
 const expressValidator = require("express-validator");
