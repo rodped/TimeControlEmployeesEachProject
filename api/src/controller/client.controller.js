@@ -43,30 +43,18 @@ async function create(req, res) {
 
 // Mostrar todos os registos da base de dados
 async function retrieveAll(req, res) {
-  try {
-    const query = connect.con.query(
-      "SELECT name, email FROM clients order by id asc",
-      async function(err, rows, fields) {
-        console.log(query.sql);
-        if (err) {
-          console.log(err);
-          await res
-            .status(jsonMessages.db.dbError.status)
-            .send(jsonMessages.db.dbError);
-        } else {
-          if (rows.length == 0) {
-            await res
-              .status(jsonMessages.db.noRecords.status)
-              .send(jsonMessages.db.noRecords);
-          } else {
-            await res.send(rows);
-          }
-        }
-      }
-    );
-  } catch (error) {
-    await res.status(jsonMessages.db.error.status).send(jsonMessages.db.error);
-  }
+  Client.findAll({
+    attributes: ["name", "email"]
+  }).then(client => {
+    if (client === null) {
+      res
+        .status(jsonMessages.db.noRecords.status)
+        .send(jsonMessages.db.noRecords);
+      return;
+    } else {
+      res.send(client);
+    }
+  });
 }
 
 // Alterar um registo na base de dados pelo seu id
