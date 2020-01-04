@@ -305,15 +305,17 @@ async function verifyToken(req, res) {
   let id = -1;
   let token = req.headers["x-access-token"];
   if (!token) {
-    return res
+    res
       .status(loginMessages.user.noTokenProvidedError.status)
       .send(loginMessages.user.noTokenProvidedError);
+    return;
   }
   jwt.verify(token, config.secret, (err, decoded) => {
     if (err) {
-      return res
+      res
         .status(loginMessages.user.loginError.status)
         .send(loginMessages.user.loginError);
+      return;
     }
     id = decoded.id;
   });

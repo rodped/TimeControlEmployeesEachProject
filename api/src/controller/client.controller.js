@@ -1,3 +1,5 @@
+let jwt = require("jsonwebtoken");
+
 const connect = require("../config/connectMySQL");
 const jsonMessages = require("../assets/jsonMessages/dbMessages");
 const db = require("../config/db.config.js");
@@ -43,8 +45,9 @@ async function create(req, res) {
 
 // Mostrar todos os registos da base de dados
 async function retrieveAll(req, res) {
-  Client.findAll({
-    attributes: ["name", "email"]
+  let exposedHeaders = "content-range";
+  Client.findAndCountAll({
+    attributes: ["id", "name", "email"]
   }).then(client => {
     if (client === null) {
       res
@@ -52,7 +55,8 @@ async function retrieveAll(req, res) {
         .send(jsonMessages.db.noRecords);
       return;
     } else {
-      res.send(client);
+      res.header(exposedHeaders, client.count);
+      res.send(client.rows);
     }
   });
 }
