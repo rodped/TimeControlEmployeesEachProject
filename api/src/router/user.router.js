@@ -3,6 +3,8 @@ const { check, validationResult } = require("express-validator");
 
 const userController = require("../controller/user.controller");
 const jsonMessages = require("../assets/jsonMessages/dbMessages");
+const verifySignUp = require("./verifySignUp");
+const authJwt = require("./verifyJwtToken");
 
 // Inserir registo na base de dados
 router.post(
@@ -105,5 +107,12 @@ router.post(
 router.get("/isAdmin", async (req, res) => {
   userController.isAdmin(req, res);
 });
+
+// Mostrar registo pelo seu id
+router.get(
+  "/:id",
+  [authJwt.verifyToken, authJwt.isAdmin],
+  userController.retrieveById
+);
 
 module.exports = router;

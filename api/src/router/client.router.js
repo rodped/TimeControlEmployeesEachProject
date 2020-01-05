@@ -67,4 +67,9 @@ router.delete("/:id", async (req, res) => {
   clientController.remove(req.params.id, req, res);
 });
 
+// Mostrar registo pelo seu id
+router.get("/:id", async (req, res) => {
+  clientController.retrieveById(req, res);
+});
+
 module.exports = router;

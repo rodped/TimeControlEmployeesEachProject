@@ -48,7 +48,7 @@ app.use(bodyParser.json());
 const cors = require("cors");
 app.use(
   cors({
-    exposedHeaders: ["content-range"]
+    exposedHeaders: ["X-Total-Count"]
   })
 );
 

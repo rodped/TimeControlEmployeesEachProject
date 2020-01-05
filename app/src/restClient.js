@@ -61,6 +61,7 @@ const convertRESTRequestToHTTP = (type, resource, params) => {
       options.body = JSON.stringify(params.data);
       break;
     case CREATE:
+      console.log("convertRESTRequestToHTTP -- CREATE: "+JSON.stringify(params))
       url = `${API_URL}/${resource}`;
       options.method = "POST";
       options.body = JSON.stringify(params.data);
@@ -91,13 +92,14 @@ const convertHTTPResponseToREST = (response, type, resource, params) => {
         data: json.map(x => x),
         total: parseInt(
           headers
-            .get("content-range")
+            .get("X-Total-Count")
             .split("/")
             .pop(),
           10
         )
       };
     case CREATE:
+      console.log(JSON.stringify(params))
       return { data: { ...params.data, id: json.id } };
     default:
       return { data: json };

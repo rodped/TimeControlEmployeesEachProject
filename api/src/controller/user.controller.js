@@ -59,9 +59,10 @@ async function create(req, res) {
 
 // Mostrar todos os registos da base de dados
 async function retrieveAll(req, res) {
+  let exposedHeaders = "X-Total-Count";
   try {
     const query = connect.con.query(
-      "SELECT u.name, u.username, u.email, r.name AS role FROM users u INNER JOIN user_roles u_r ON u.id=u_r.userId INNER JOIN roles r ON u_r.roleId=r.Id",
+      "SELECT u.id, u.name, u.username, u.email, r.name AS role FROM users u INNER JOIN user_roles u_r ON u.id=u_r.userId INNER JOIN roles r ON u_r.roleId=r.Id",
       async function(err, rows, fields) {
         console.log(query.sql);
         if (err) {
@@ -75,7 +76,10 @@ async function retrieveAll(req, res) {
               .status(jsonMessages.db.noRecords.status)
               .send(jsonMessages.db.noRecords);
           } else {
-            await res.send(rows);
+            User.count().then(user => {
+              res.header(exposedHeaders, user);
+              res.send(rows);
+            });
           }
         }
       }
@@ -168,31 +172,36 @@ async function remove(id, req, res) {
 }
 
 // Mostrar um registo pelo seu id
-async function retrieveById(id, req, res) {
+async function retrieveById(req, res) {
+  let exposedHeaders = "X-Total-Count";
   try {
     const query = connect.con.query(
       "SELECT u.id, u.name, u.username, u.email, r.name AS role FROM users u INNER JOIN user_roles u_r ON u.id=u_r.userId INNER JOIN roles r ON u_r.roleId=r.Id WHERE u.id = ?",
-      id,
+      req.params.id,
       async function(err, rows, fields) {
         console.log(query.sql);
         if (err) {
           console.log(err);
-          await res
+          res
             .status(jsonMessages.db.dbError.status)
             .send(jsonMessages.db.dbError);
+          return;
         } else {
           if (rows.length == 0) {
-            await res
+            res
               .status(jsonMessages.db.noRecords.status)
               .send(jsonMessages.db.noRecords);
+            return;
           } else {
-            await res.send(rows);
+            res.header(exposedHeaders, 1);
+            res.send(rows[0]);
           }
         }
       }
     );
   } catch (error) {
-    await res.status(jsonMessages.db.error.status).send(jsonMessages.db.error);
+    res.status(jsonMessages.db.error.status).send(jsonMessages.db.error);
+    return;
   }
 }
 
@@ -314,44 +323,42 @@ async function login(req, res) {
 
 // Verificar se utilizador é administrador
 async function isAdmin(req, res, next) {
-  const id = await verifyToken(req, res);
-  if (id !== -1) {
-    try {
-      const query = connect.con.query(
-        "SELECT r.name AS role FROM users u INNER JOIN user_roles u_r ON u.id=u_r.userId INNER JOIN roles r ON u_r.roleId=r.Id WHERE u.id = ?",
-        id,
-        async function(err, rows) {
-          console.log(query.sql);
-          if (err) {
-            console.log(err);
+  // await verifyToken(req, res);
+  try {
+    const query = connect.con.query(
+      "SELECT r.name AS role FROM users u INNER JOIN user_roles u_r ON u.id=u_r.userId INNER JOIN roles r ON u_r.roleId=r.Id WHERE u.id = ?",
+      id,
+      async function(err, rows) {
+        console.log(query.sql);
+        if (err) {
+          console.log(err);
+          res
+            .status(jsonMessages.db.dbError.status)
+            .send(jsonMessages.db.dbError);
+          return;
+        } else {
+          if (rows.length == 0) {
             res
-              .status(jsonMessages.db.dbError.status)
-              .send(jsonMessages.db.dbError);
+              .status(jsonMessages.db.noRecords.status)
+              .send(jsonMessages.db.noRecords);
             return;
           } else {
-            if (rows.length == 0) {
-              res
-                .status(jsonMessages.db.noRecords.status)
-                .send(jsonMessages.db.noRecords);
+            if (rows[0].role == "ADMIN") {
+              next();
               return;
             } else {
-              if (rows[0].role == "ADMIN") {
-                next();
-                return;
-              } else {
-                res
-                  .status(loginMessages.user.isAdminError.status)
-                  .send(loginMessages.user.isAdminError);
-                return;
-              }
+              res
+                .status(loginMessages.user.isAdminError.status)
+                .send(loginMessages.user.isAdminError);
+              return;
             }
           }
         }
-      );
-    } catch (error) {
-      res.status(jsonMessages.db.error.status).send(jsonMessages.db.error);
-      return;
-    }
+      }
+    );
+  } catch (error) {
+    res.status(jsonMessages.db.error.status).send(jsonMessages.db.error);
+    return;
   }
 }
 
@@ -411,8 +418,7 @@ async function checkRolesExisted(req, res) {
 }
 
 // Verificar se foi fornecido um token
-async function verifyToken(req, res) {
-  let id = -1;
+async function verifyToken(req, res, next) {
   let token = req.headers["x-access-token"];
   if (!token) {
     return res
@@ -426,8 +432,8 @@ async function verifyToken(req, res) {
         .send(loginMessages.user.loginError);
     }
     id = decoded.id;
+    next();
   });
-  return id;
 }
 
 module.exports = {
@@ -437,6 +443,7 @@ module.exports = {
   remove,
   login,
   isAdmin,
+  retrieveById,
   checkRolesExisted,
   verifyToken
 };
