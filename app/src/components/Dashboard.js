@@ -1,25 +1,10 @@
 import React, { Component } from "react";
 import { Card, CardHeader, CardText } from "material-ui/Card";
-import {
-  GET_ONE,
-  GET_LIST,
-  SimpleForm,
-  TextInput,
-  required,
-  ReferenceInput,
-  SelectInput
-} from "admin-on-rest";
-import SelectField from "material-ui/SelectField";
+import { GET_ONE, GET_LIST } from "admin-on-rest";
 import MenuItem from "material-ui/MenuItem";
 import myApiRestClient from "../restClient";
 import Select from "@material-ui/core/Select";
 import Button from "@material-ui/core/Button";
-import Avatar from "@material-ui/core/Avatar";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import TextField from "@material-ui/core/TextField";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-import Typography from "@material-ui/core/Typography";
-import Container from "@material-ui/core/Container";
 
 class Dashboard extends Component {
   state = {
@@ -39,12 +24,7 @@ class Dashboard extends Component {
       pagination: {},
       sort: {},
       filter: {}
-    }).then(
-      response => (
-        this.setState({ works: response.data }),
-        console.log("\t\t" + JSON.stringify(this.state.works))
-      )
-    );
+    }).then(response => this.setState({ works: response.data }));
   }
 
   submit = async e => {
@@ -71,12 +51,13 @@ class Dashboard extends Component {
           <p>Id: {this.state.id}</p>
           <p>Work: {this.state.work}</p>
           <p>Client: {this.state.client}</p>
-          <p>Start: {this.state.startTime}</p>
-          <p>End: {this.state.endTime}</p>
-          <p>Time: {this.state.workTime}</p>
+          <p>Employee: {this.state.employee}</p>
+          <p>Start time: {this.state.startTime}</p>
+          <p>End time: {this.state.endTime}</p>
+          <p>Work Time: {this.state.workTime}</p>
 
           <hr />
-          
+
           <p>Calculate Time of Work</p>
           <form onSubmit={this.submit}>
             <div>

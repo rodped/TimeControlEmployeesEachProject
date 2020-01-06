@@ -10,8 +10,7 @@ import { push as pushAction } from "react-router-redux";
 class StartWorkButton extends Component {
   handleClick = () => {
     const { push, work, showNotification } = this.props;
-    console.log("\n\n" + work.name);
-    restClient(CREATE, "works/startWork", { data: work})
+    restClient(CREATE, "works/startWork", { data: work })
       .then(() => {
         showNotification("Work started");
         push("/works");

@@ -9,32 +9,32 @@ import {
   EmailField,
   Edit,
   DisabledInput,
-  Filter,
   Responsive,
   SimpleList,
   EditButton,
-  required
-} from "admin-on-rest";
+  required} from "admin-on-rest";
 
-export const ClientList = props => (
+export const ClientList = ({ ...props }) => (
   <List {...props}>
-    <Responsive
-      small={
-        <SimpleList
-          primaryText={record => record.name}
-          secondaryText={record => record.email}
-          tertiaryText={record => record.id}
-        />
-      }
-      medium={
-        <Datagrid>
-          <TextField source="id" />
-          <TextField source="name" />
-          <EmailField source="email" />
-          <EditButton />
-        </Datagrid>
-      }
-    />
+    {permissions => (
+      <Responsive
+        small={
+          <SimpleList
+            primaryText={record => record.name}
+            secondaryText={record => record.email}
+            tertiaryText={record => record.id}
+          />
+        }
+        medium={
+          <Datagrid>
+            <TextField source="id" />
+            <TextField source="name" />
+            <EmailField source="email" />
+            {permissions === "ROLE_ADMIN" ? <EditButton /> : null}
+          </Datagrid>
+        }
+      />
+    )}
   </List>
 );
 

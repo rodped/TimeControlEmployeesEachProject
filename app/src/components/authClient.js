@@ -46,6 +46,17 @@ export default (type, params) => {
   }
 
   if (type === AUTH_CHECK) {
+    const { resource } = params;
+    if (resource === "users") {
+      return localStorage.getItem("role")
+        ? Promise.resolve()
+        : Promise.reject({ redirectTo: "/no-access" });
+    }
+    if (resource === "clients") {
+      return localStorage.getItem("role")
+        ? Promise.resolve()
+        : Promise.reject({ redirectTo: "/no-access" });
+    }
     return localStorage.getItem("x-access-token")
       ? Promise.resolve()
       : Promise.reject();

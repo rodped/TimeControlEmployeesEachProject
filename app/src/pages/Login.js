@@ -18,32 +18,16 @@ class Login extends Component {
 
   submit = e => {
     e.preventDefault();
-    // gather your data/credentials here
     const credentials = {
       username: this.state.username,
       password: this.state.password
     };
 
-    // Dispatch the userLogin action (injected by connect)
     this.props.userLogin(credentials);
   };
 
   render() {
     return (
-      // <form onSubmit={this.submit}>
-      //   <input
-      //     type="text"
-      //     placeholder="username"
-      //     onChange={e => this.setState({ username: e.target.value })}
-      //   />
-      //   <input
-      //     type="password"
-      //     placeholder="password"
-      //     onChange={e => this.setState({ password: e.target.value })}
-      //   />
-      //   <button type="submit">Sign In</button>
-      // </form>
-
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <div>

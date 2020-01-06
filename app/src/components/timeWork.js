@@ -19,10 +19,7 @@ class TimeWorkButton extends Component {
       .then(response => {
         showNotification("Time of Work Calculated");
         this.setState({ response: response });
-        // this.props.history.push("/");
-        console.log("\t\t" + JSON.stringify(this.state.response.data[0].id));
         push("/");
-        // this.btnTime.label = "";
       })
       .catch(e => {
         console.error(e);
@@ -43,9 +40,7 @@ class TimeWorkButton extends Component {
         ref={this.btnTime}
         label="Hours Work"
         onClick={this.handleClick}
-      >
-        {/* {this.state.response.data} */}
-      </FlatButton>
+      ></FlatButton>
     );
   }
 }

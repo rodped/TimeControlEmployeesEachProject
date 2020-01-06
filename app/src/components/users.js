@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  Filter,
   List,
   Responsive,
   SimpleList,
@@ -17,27 +16,30 @@ import {
   required
 } from "admin-on-rest";
 
-export const UserList = props => (
+export const UserList = ({ ...props }) => (
   <List {...props}>
-    <Responsive
-      small={
-        <SimpleList
-          primaryText={record => record.name}
-          secondaryText={record => record.email}
-          tertiaryText={record => record.id}
-        />
-      }
-      medium={
-        <Datagrid>
-          <TextField source="id" />
-          <TextField source="name" />
-          <TextField source="username" />
-          <TextField source="role" />
-          <EmailField source="email" />
-          <EditButton />
-        </Datagrid>
-      }
-    />
+    {permissions => (
+      <Responsive
+        small={
+          <SimpleList
+            primaryText={record => record.name}
+            secondaryText={record => record.email}
+            tertiaryText={record => record.id}
+          />
+        }
+        medium={
+          <Datagrid>
+            <TextField source="id" />
+            <TextField source="name" />
+            <TextField source="username" />
+            <TextField source="role" />
+            <EmailField source="email" />
+
+            {permissions === "ROLE_ADMIN" ? <EditButton /> : null}
+          </Datagrid>
+        }
+      />
+    )}
   </List>
 );
 

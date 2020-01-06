@@ -3,7 +3,6 @@ import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 
 import { isAuthenticated } from "./services/auth";
 
-import Login from "./pages/Login";
 import TimeControl from "./pages/TimeControl";
 import Dashboard from "./components/Dashboard";
 
