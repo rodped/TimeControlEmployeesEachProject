@@ -4,25 +4,24 @@ const db = require("../config/db.config.js");
 const User = db.user;
 
 const jsonMessages = require("../assets/jsonMessages/dbMessages");
+const loginMessages = require("../assets/jsonMessages/loginMessages");
 
 verifyToken = (req, res, next) => {
   let token = req.headers["x-access-token"];
 
-  console.log("\n\n"+token+"\n\n")
+  console.log("\n\n" + token + "\n\n");
 
   if (!token) {
-    return res.status(403).send({
-      auth: false,
-      message: "No token provided. !!!"
-    });
+    return res
+      .status(loginMessages.user.noTokenProvidedError.status)
+      .send(loginMessages.user.noTokenProvidedError);
   }
 
   jwt.verify(token, config.secret, (err, decoded) => {
     if (err) {
-      return res.status(500).send({
-        auth: false,
-        message: "Fail to Authentication. Error -> " + err
-      });
+      return res
+        .status(loginMessages.user.loginError.status)
+        .send(loginMessages.user.loginError);
     }
     req.userId = decoded.id;
     next();
@@ -41,7 +40,9 @@ isAdmin = (req, res, next) => {
           }
         }
 
-        res.status(403).send("Require Admin Role!");
+        res
+          .status(loginMessages.user.isAdminError.status)
+          .send(loginMessages.user.isAdminError);
         return;
       });
     } else {

@@ -3,10 +3,12 @@ const { check, validationResult } = require("express-validator");
 
 const clientController = require("../controller/client.controller");
 const jsonMessages = require("../assets/jsonMessages/dbMessages");
+const authJwt = require("./verifyJwtToken");
 
 // Inserir registo na base de dados
 router.post(
   "/",
+  [authJwt.verifyToken, authJwt.isAdmin],
   [
     check("name")
       .exists()
@@ -31,13 +33,14 @@ router.post(
 );
 
 // Mostrar todos os registos da base de dados
-router.get("/", async (req, res) => {
+router.get("/", [authJwt.verifyToken], async (req, res) => {
   clientController.retrieveAll(req, res);
 });
 
 // Alterar um registo na base de dados pelo seu id
 router.put(
   "/:id",
+  [authJwt.verifyToken, authJwt.isAdmin],
   [
     check("name")
       .exists()
@@ -63,12 +66,16 @@ router.put(
 );
 
 // Remover um registo na base de dados pelo seu id
-router.delete("/:id", async (req, res) => {
-  clientController.remove(req.params.id, req, res);
-});
+router.delete(
+  "/:id",
+  [authJwt.verifyToken, authJwt.isAdmin],
+  async (req, res) => {
+    clientController.remove(req.params.id, req, res);
+  }
+);
 
 // Mostrar registo pelo seu id
-router.get("/:id", async (req, res) => {
+router.get("/:id", [authJwt.verifyToken], async (req, res) => {
   clientController.retrieveById(req, res);
 });
 

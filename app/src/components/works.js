@@ -39,10 +39,8 @@ export const WorkList = props => (
       small={
         <SimpleList
           primaryText={record => record.name}
-          // secondaryText={record => `${record.views} views`}
-          // tertiaryText={record =>
-          //   new Date(record.published_at).toLocaleDateString()
-          // }
+          secondaryText={record => record.client}
+          tertiaryText={record => record.id}
         />
       }
       medium={

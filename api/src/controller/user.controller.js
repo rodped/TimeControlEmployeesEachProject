@@ -99,14 +99,15 @@ async function update(id, req, res) {
     else {
       const name = req.body.name;
       const email = req.body.email;
+      const password = bcrypt.hashSync(req.body.password, 8);
       const date = new Date()
         .toISOString()
         .replace(/T/, " ")
         .replace(/\..+/, "");
       try {
-        const update = [name, email, date, id];
+        const update = [name, email, password, date, id];
         const query = connect.con.query(
-          "UPDATE users SET name =?, email =?, updatedAt=? WHERE id=?",
+          "UPDATE users SET name=?, email=?, password=?, updatedAt=? WHERE id=?",
           update,
           async function(err, rows, fields) {
             console.log(query.sql);
@@ -266,14 +267,15 @@ async function login(req, res) {
           .status(loginMessages.user.loginError.status)
           .send(loginMessages.user.loginError);
       }
-      var token = jwt.sign({ id: user.id }, config.secret, {
-        expiresIn: 86400 // expires in 24 hours
-      });
       var authorities = [];
       user.getRoles().then(roles => {
         for (let i = 0; i < roles.length; i++) {
           authorities.push("ROLE_" + roles[i].name.toUpperCase());
         }
+        let role = authorities[0];
+        var token = jwt.sign({ id: user.id, role: role }, config.secret, {
+          expiresIn: 86400 // expires in 24 hours
+        });
         res.status(200).send({
           auth: true,
           accessToken: token,

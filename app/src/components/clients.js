@@ -16,22 +16,14 @@ import {
   required
 } from "admin-on-rest";
 
-const ClientFilter = props => (
-  <Filter {...props}>
-    <TextInput label="Search" source="q" alwaysOn />
-  </Filter>
-);
-
 export const ClientList = props => (
-  <List {...props} filters={<ClientFilter />}>
+  <List {...props}>
     <Responsive
       small={
         <SimpleList
           primaryText={record => record.name}
-          // secondaryText={record => `${record.views} views`}
-          // tertiaryText={record =>
-          //   new Date(record.published_at).toLocaleDateString()
-          // }
+          secondaryText={record => record.email}
+          tertiaryText={record => record.id}
         />
       }
       medium={

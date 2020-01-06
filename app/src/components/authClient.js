@@ -1,4 +1,10 @@
-import { AUTH_LOGIN, AUTH_LOGOUT, AUTH_ERROR, AUTH_CHECK, AUTH_GET_PERMISSIONS } from "admin-on-rest";
+import {
+  AUTH_LOGIN,
+  AUTH_LOGOUT,
+  AUTH_ERROR,
+  AUTH_CHECK,
+  AUTH_GET_PERMISSIONS
+} from "admin-on-rest";
 import decodeJwt from "jwt-decode";
 
 export default (type, params) => {
@@ -17,12 +23,15 @@ export default (type, params) => {
         return response.json();
       })
       .then(({ accessToken }) => {
+        const decodedToken = decodeJwt(accessToken);
         localStorage.setItem("x-access-token", accessToken);
+        localStorage.setItem("role", decodedToken.role);
       });
   }
 
   if (type === AUTH_LOGOUT) {
     localStorage.removeItem("x-access-token");
+    localStorage.removeItem("role");
     return Promise.resolve();
   }
 
@@ -30,6 +39,7 @@ export default (type, params) => {
     const status = params.message.status;
     if (status === 401 || status === 403) {
       localStorage.removeItem("x-access-token");
+      localStorage.removeItem("role");
       return Promise.reject();
     }
     return Promise.resolve();
@@ -38,7 +48,7 @@ export default (type, params) => {
   if (type === AUTH_CHECK) {
     return localStorage.getItem("x-access-token")
       ? Promise.resolve()
-      : Promise.reject({ redirectTo: "/no-access" });
+      : Promise.reject();
   }
 
   if (type === AUTH_GET_PERMISSIONS) {
@@ -46,5 +56,5 @@ export default (type, params) => {
     return Promise.resolve(role);
   }
 
-  return Promise.resolve();
+  return Promise.reject("Unknown method");
 };

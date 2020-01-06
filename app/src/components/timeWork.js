@@ -9,19 +9,20 @@ import { push as pushAction } from "react-router-redux";
 
 class TimeWorkButton extends Component {
   state = {
-    response: ""
+    response: null
   };
   btnTime = createRef();
 
   handleClick = () => {
     const { push, work, showNotification } = this.props;
-    restClient(GET_ONE, "works/timeWork", { id: work.id }, { data: work })
+    restClient(GET_ONE, "works/timeWork", { id: work.id })
       .then(response => {
         showNotification("Time of Work Calculated");
         this.setState({ response: response });
-        console.log("\t\t" + JSON.stringify(this.state.response.data));
-        // push("/works");
-        this.btnTime.label = "";
+        // this.props.history.push("/");
+        console.log("\t\t" + JSON.stringify(this.state.response.data[0].id));
+        push("/");
+        // this.btnTime.label = "";
       })
       .catch(e => {
         console.error(e);
@@ -43,7 +44,7 @@ class TimeWorkButton extends Component {
         label="Hours Work"
         onClick={this.handleClick}
       >
-        {this.state.response.data}
+        {/* {this.state.response.data} */}
       </FlatButton>
     );
   }

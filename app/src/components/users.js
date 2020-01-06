@@ -17,22 +17,14 @@ import {
   required
 } from "admin-on-rest";
 
-const UserFilter = props => (
-  <Filter {...props}>
-    <TextInput label="Search" source="q" alwaysOn />
-  </Filter>
-);
-
 export const UserList = props => (
-  <List {...props} filters={<UserFilter />}>
+  <List {...props}>
     <Responsive
       small={
         <SimpleList
           primaryText={record => record.name}
-          // secondaryText={record => `${record.views} views`}
-          // tertiaryText={record =>
-          //   new Date(record.published_at).toLocaleDateString()
-          // }
+          secondaryText={record => record.email}
+          tertiaryText={record => record.id}
         />
       }
       medium={
@@ -60,6 +52,7 @@ export const UserEdit = props => (
       <TextInput source="name" validate={required} />
       <TextInput source="username" validate={required} />
       <TextInput source="email" validate={required} />
+      <TextInput source="password" validate={required} type="password" />
       {/* <CheckboxGroupInput
         source="roles"
         choices={[

@@ -59,17 +59,10 @@ async function retrieveAll(req, res) {
           .status(jsonMessages.db.error.status)
           .send(jsonMessages.db.error);
       } else {
-        if (rows.length == 0) {
-          await res
-            .header(exposedHeaders, 0)
-            .status(jsonMessages.db.noRecords.status)
-            .send(jsonMessages.db.noRecords);
-        } else {
-          Work.count().then(work => {
-            res.header(exposedHeaders, work);
-            res.send(rows);
-          });
-        }
+        Work.count().then(work => {
+          res.header(exposedHeaders, work);
+          res.send(rows);
+        });
       }
     }
   );
@@ -216,39 +209,43 @@ async function startWork(req, res) {
     .replace(/T/, " ")
     .replace(/\..+/, "");
   let idUser = await verifyToken(req, res);
-  let idWork = -1;
+  let idWork = req.body.id;
 
-  Work.findOne({
-    where: {
-      name: req.body.name
-    }
-  }).then(work => {
-    if (work === null) {
-      return res
-        .status(jsonMessages.db.noRecords.status)
-        .send(jsonMessages.db.noRecords);
-    } else {
-      idWork = work.id;
+  if (idUser !== -1) {
+    Work.findOne({
+      where: {
+        id: idWork
+      }
+    }).then(work => {
+      if (work === null) {
+        return res
+          .status(jsonMessages.db.noRecords.status)
+          .send(jsonMessages.db.noRecords);
+      } else {
+        idWork = work.id;
 
-      if (idWork !== -1 && idUser !== -1) {
         Time.create({
           start: date,
           workId: idWork,
           userId: idUser
-        })
-          .then(time => {
-            return res
-              .status(jsonMessages.db.createSucces.status)
-              .send(jsonMessages.db.createSucces);
-          })
-          .catch(err => {
+        }).then(time => {
+          if (time == null) {
             return res
               .status(jsonMessages.db.error.status)
               .send(jsonMessages.db.error);
-          });
+          } else {
+            return res
+              .status(jsonMessages.db.createSucces.status)
+              .send(jsonMessages.db.createSucces);
+          }
+        });
       }
-    }
-  });
+    });
+  } else {
+    return res
+      .status(jsonMessages.db.noRecords.status)
+      .send(jsonMessages.db.noRecords);
+  }
 }
 
 // Fechar trabalho
@@ -258,45 +255,64 @@ async function endWork(req, res) {
     .replace(/T/, " ")
     .replace(/\..+/, "");
   let idUser = await verifyToken(req, res);
-  let idWork = -1;
+  let idWork = req.body.id;
 
-  Work.findOne({
-    where: {
-      name: req.body.name
-    }
-  }).then(work => {
-    if (work === null) {
-      return res
-        .status(jsonMessages.db.noRecords.status)
-        .send(jsonMessages.db.noRecords);
-    } else {
-      idWork = work.id;
+  if (idUser !== -1) {
+    Work.findOne({
+      where: {
+        id: idWork
+      }
+    }).then(work => {
+      if (work === null) {
+        return res
+          .status(jsonMessages.db.noRecords.status)
+          .send(jsonMessages.db.noRecords);
+      } else {
+        idWork = work.id;
 
-      if (idWork !== -1 && idUser !== -1) {
-        Time.create({
-          end: date,
-          workId: idWork,
-          userId: idUser
-        })
-          .then(time => {
-            return res
-              .status(jsonMessages.db.createSucces.status)
-              .send(jsonMessages.db.createSucces);
-          })
-          .catch(err => {
+        Time.update(
+          {
+            end: date
+          },
+          {
+            where: {
+              workId: idWork,
+              userId: idUser
+            }
+          }
+        ).then(time => {
+          if (time == null) {
             return res
               .status(jsonMessages.db.error.status)
               .send(jsonMessages.db.error);
-          });
+          } else {
+            return res
+              .status(jsonMessages.db.createSucces.status)
+              .send(jsonMessages.db.createSucces);
+          }
+        });
       }
-    }
-  });
+    });
+  } else {
+    return res
+      .status(jsonMessages.db.noRecords.status)
+      .send(jsonMessages.db.noRecords);
+  }
 }
 
 // Calcular tempo de trabalho
 async function timeWork(req, res) {
   const query = connect.con.query(
-    "SELECT start, end FROM times WHERE workId = ?",
+    "SELECT w.id, w.name AS work, c.name AS client, u.name AS employee, " +
+      "DATE_FORMAT(t.start,'%Y-%m%-%d %H:%i:%s') AS startTime, " +
+      "DATE_FORMAT(t.end,'%Y-%m%-%d %H:%i:%s') AS endTime, " +
+      "CONCAT(FLOOR(TIMESTAMPDIFF(SECOND, t.start, t.end) / 3600), ' Hours, ', " +
+      "FLOOR((TIMESTAMPDIFF(SECOND, t.start, t.end) % 3600)/60), ' Minutes, ', " +
+      "(TIMESTAMPDIFF(SECOND, t.start, t.end) % 60), ' Seconds') AS workTime " +
+      "FROM clients c INNER JOIN works w ON c.id=w.clientId " +
+      "INNER JOIN times t ON w.id = t.workId " +
+      "INNER JOIN users u ON t.userId=u.id " +
+      "WHERE w.id = ?",
     req.params.id,
     async function(err, rows, fields) {
       console.log(query.sql);
@@ -311,12 +327,7 @@ async function timeWork(req, res) {
             .status(jsonMessages.db.noRecords.status)
             .send(jsonMessages.db.noRecords);
         } else {
-          let endTime = moment(rows[1].end);
-          let startTime = moment(rows[0].start);
-          let timeWork = moment.duration(
-            endTime.diff(startTime, "hours", true)
-          );
-          await res.send(timeWork + "");
+          res.send(rows);
         }
       }
     }

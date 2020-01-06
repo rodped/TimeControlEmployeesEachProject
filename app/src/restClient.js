@@ -61,7 +61,9 @@ const convertRESTRequestToHTTP = (type, resource, params) => {
       options.body = JSON.stringify(params.data);
       break;
     case CREATE:
-      console.log("convertRESTRequestToHTTP -- CREATE: "+JSON.stringify(params))
+      console.log(
+        "convertRESTRequestToHTTP -- CREATE: " + JSON.stringify(params)
+      );
       url = `${API_URL}/${resource}`;
       options.method = "POST";
       options.body = JSON.stringify(params.data);
@@ -87,7 +89,11 @@ const convertHTTPResponseToREST = (response, type, resource, params) => {
   const { headers, json } = response;
   switch (type) {
     case GET_LIST:
-      console.log(JSON.stringify(json)+"\n\n"+JSON.stringify(headers.get("x-access-token")))
+      console.log(
+        JSON.stringify(json) +
+          "\n\n" +
+          JSON.stringify(headers.get("x-access-token"))
+      );
       return {
         data: json.map(x => x),
         total: parseInt(
@@ -99,7 +105,7 @@ const convertHTTPResponseToREST = (response, type, resource, params) => {
         )
       };
     case CREATE:
-      console.log(JSON.stringify(params))
+      console.log(JSON.stringify(params));
       return { data: { ...params.data, id: json.id } };
     default:
       return { data: json };
@@ -114,7 +120,10 @@ const convertHTTPResponseToREST = (response, type, resource, params) => {
  */
 export default (type, resource, params) => {
   const { fetchJson } = fetchUtils;
-  const { url, options } = convertRESTRequestToHTTP(type, resource, params);
+  const { url, options } = convertRESTRequestToHTTP(type, resource, params); 
+  const token = localStorage.getItem("x-access-token");
+  options.headers = new Headers({ Accept: 'application/json' })
+  options.headers.set('x-access-token', token);
   return fetchJson(url, options).then(response =>
     convertHTTPResponseToREST(response, type, resource, params)
   );
