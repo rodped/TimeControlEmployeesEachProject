@@ -2,9 +2,9 @@ const app = require("./server");
 const router = require("./src/routers/router.js");
 const expressSanitizer = require("express-sanitizer");
 const bodyParser = require("body-parser");
-const expressValidator = require("express-validator");
-const session = require('express-session');
+const session = require("express-session");
 const bcrypt = require("bcrypt");
+
 const db = require("./src/config/db.config.js");
 const Role = db.role;
 const User = db.user;
@@ -13,7 +13,7 @@ app.use(bodyParser.json(), bodyParser.urlencoded({ extended: true }));
 app.use(expressSanitizer());
 app.use(
   session({
-    secret: "webbookfca",
+    secret: "timecontrol",
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -24,13 +24,11 @@ app.use(
   })
 );
 
-// force: true will drop the table if it already exists
+// Elimina a tabela se ela existir
 db.sequelize.sync({ force: true }).then(() => {
   console.log("Drop and Resync with { force: true }");
   initial();
 });
-
-const roles1 = ["ADMIN"];
 
 function initial() {
   Role.create({
